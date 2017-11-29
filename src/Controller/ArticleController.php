@@ -29,21 +29,18 @@ class ArticleController extends Controller {
     /**
      * @Route(path="/new", name="article_new")
      */
-    public function newAction(Request $request) {
+    public function newAction(Request $request, NewArticleHandler $articleHandler) {
 
-        if($this->getUser()->getRoles() != 'ROLE_AUTHOR') {
+        // changer en != pour tester sans passer par un autre utilisateur
+        if($this->getUser()->getRoles() == 'ROLE_AUTHOR') {
 
             $article = $this->get(\App\Entity\Article::class);
             $form = $this->createForm(ArticleType::class);
 
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
-                /*
-                $articleHandler->handle($form->getData());
-                $manager->flush();*/
-                $em = $this->getDoctrine()->getManager();
-                $em-> persist($article);
-                $em-> flush();
+
+                $articleHandler->handle($article);
 
             }
 

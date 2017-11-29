@@ -24,7 +24,7 @@ class ArticleType extends AbstractType
         ;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
-    {
+    public function configureOptions(OptionsResolver $resolver) {
+        $resolver->setDefaults(['date_class' => Article::class]);
     }
 }
