@@ -16,29 +16,49 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * @Route(path="/article")
  */
-class ArticleController extends Controller
-{
+class ArticleController extends Controller {
+
     /**
      * @Route(path="/show/{slug}", name="article_show")
      */
-    public function showAction()
-    {
+    public function showAction() {
+
+        return $this->render('Article/show.html.twig');
     }
 
     /**
      * @Route(path="/new", name="article_new")
      */
-    public function newAction()
-    {
-        // Seul les auteurs doivent avoir access.
+    public function newAction(Request $request) {
+
+        if($this->getUser()->getRoles() != 'ROLE_AUTHOR') {
+
+            $article = $this->get(\App\Entity\Article::class);
+            $form = $this->createForm(ArticleType::class);
+
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                /*
+                $articleHandler->handle($form->getData());
+                $manager->flush();*/
+                $em = $this->getDoctrine()->getManager();
+                $em-> persist($article);
+                $em-> flush();
+
+            }
+
+            return $this->render('Article/new.html.twig', ['form' => $form->createView()]);
+        }
     }
 
     /**
      * @Route(path="/update/{slug}", name="article_update")
      */
-    public function updateAction()
-    {
+    public function updateAction() {
         // Seul les auteurs doivent avoir access.
         // Seul l'auteur de l'article peut le modifier
+        if($this->getUser()->getRoles() == 'ROLE_AUTHOR') {
+            return $this->render('Article/update.html.twig');
+        }
     }
 }
